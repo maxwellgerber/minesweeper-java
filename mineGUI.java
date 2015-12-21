@@ -14,24 +14,19 @@ import java.util.Random;
 class mineGUI extends TopLevel{
 
     /** A new window with given TITLE and displaying B. */
-    mineGUI(String title, Game b) {
+    mineGUI(String title, Board b) {
         super(title, true);
         _b = b;
+        _disp = new Display(b);
         _randomSource = new Random();
 
-        addMenuButton("Game->New Game", "newGame");
-        addMenuButton("Game->Undo", "undo");
+        // addMenuButton("Board->New Game", "newGame");
+        // addMenuButton("Game->Undo", "undo");
         addMenuButton("Game->Quit", "quit");
 
         _disp = new Display(b);
-        add(_display, new LayoutSpec("y", 2, "width", 2));
-        _display.setMouseHandler("click", this, "mouseClicked");
-    }
-
-    /** Starts gameplay. */
-    public void play() {
-        _playable = true;
-
+        add(_disp, new LayoutSpec("y", 2, "width", 2));
+        _disp.setMouseHandler("click", this, "mouseClicked");
     }
 
     /** Returns the board this contains. */
@@ -47,18 +42,18 @@ class mineGUI extends TopLevel{
         }
     }
 
-    /** Respond to "New Game" button. */
-    public void newGame(String dummy) {
-        _b.clear();
-        _display.repaint();
-        _playable = true;
-    }
+    // /** Respond to "New Game" button. */
+    // public void newGame(String dummy) {
+    //     _b.clear();
+    //     _disp.repaint();
+    //     _playable = true;
+    // }
 
-    /** Respond to "Undo"" button. */
-    public void undo(String dummy) {
-        _b.retract();
-        _display.repaint();
-    }
+    // /** Respond to "Undo"" button. */
+    // public void undo(String dummy) {
+    //     _b.retract();
+    //     _disp.repaint();
+    // }
 
     /** Responds to MouseEvent EVENT by alterint underlying board. */
     public void mouseClicked(MouseEvent event) {
@@ -66,8 +61,10 @@ class mineGUI extends TopLevel{
     }
 
     /** The board widget. */
-    private final Display _disp;
+    private Display _disp;
 
     /** The game I am consulting. */
     private Board _b;
+
+    private Random _randomSource;
 }

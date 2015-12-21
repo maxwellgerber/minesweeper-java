@@ -1,9 +1,9 @@
 package minesweeper;
 
 import java.util.Random;
-import java.util.Arraylist;
-import minesweeper.Tile.*;
-import minesweeper.Direction.*;
+import java.util.ArrayList;
+import static minesweeper.Tile.*;
+import static minesweeper.Direction.*;
 
 public class Board {
 	Tile[][] _tiles;
@@ -28,11 +28,11 @@ public class Board {
 			}
 		}
 
-		Random r = new Random(r * c);
-		Arraylist<Integer> taken = new Arraylist<>();
+		Random rand = new Random();
+		ArrayList<Integer> taken = new ArrayList<>();
 		int filled = 0;
 		while(filled < numMines){
-			int temp = r.nextInt(r * c);
+			int temp = rand.nextInt(_r * _c);
 			if(!taken.contains(temp)) {
 				taken.add(temp);
 				filled++;
@@ -44,8 +44,8 @@ public class Board {
 	}
 
 	private void evaluate() {
-		for(int i = 0; i < r; i++) {
-			for(int j = 0; j < c; j++) {
+		for(int i = 0; i < _r; i++) {
+			for(int j = 0; j < _c; j++) {
 				if(_tiles[i][j] == EMPTY) {
 					evaluateHelper(i,j);
 				}
@@ -63,5 +63,9 @@ public class Board {
 			}
 		}
 		_tiles[r][c] = Tile.toTile(count);
+	}
+
+	private Boolean isValid(int r, int c) {
+		return (r >= 0 && c >= 0) && (r < _r && c < _c);
 	}
 }
