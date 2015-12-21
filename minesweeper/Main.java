@@ -23,6 +23,9 @@ public class Main {
 
         System.out.printf("Minesweeper. Version %s.%nType ? for help.%n",
                           VERSION);
+        Board b = new Board();
+        mineGUI gui = new mineGUI("Minesweeper-java", b);
+
     }
 
 }

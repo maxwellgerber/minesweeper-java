@@ -20,18 +20,14 @@ class mineGUI extends TopLevel{
         _disp = new Display(b);
         _randomSource = new Random();
 
-        // addMenuButton("Board->New Game", "newGame");
+        // addMenuButton("Game->New Game", "newGame");
         // addMenuButton("Game->Undo", "undo");
         addMenuButton("Game->Quit", "quit");
 
         _disp = new Display(b);
         add(_disp, new LayoutSpec("y", 2, "width", 2));
         _disp.setMouseHandler("click", this, "mouseClicked");
-    }
-
-    /** Returns the board this contains. */
-    public Board getBoard() {
-        return _b;
+        display(true);
     }
 
     /** Respond to "Quit" button. */
@@ -57,7 +53,10 @@ class mineGUI extends TopLevel{
 
     /** Responds to MouseEvent EVENT by alterint underlying board. */
     public void mouseClicked(MouseEvent event) {
-        int x = event.getX() / (8 * 9 + 3), y = event.getY() / (8 * 9 + 3);
+        int x = event.getX() / (16), y = event.getY() / (16);
+        System.out.println("X: " + x + " Y: " + y);
+        _b.click(x, y);
+        _disp.repaint();
     }
 
     /** The board widget. */

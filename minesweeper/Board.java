@@ -7,24 +7,32 @@ import static minesweeper.Direction.*;
 
 public class Board {
 	Tile[][] _tiles;
+	Boolean[][] _clicked;
+	Boolean[][] _flag;
+
 	int _r, _c;
 	
 	public Board() {
-		this(50,50);
+		this(16,16);
 	}
 
 	public Board(int r, int c) {
-		this(r, c, r * c / 8);
+		this(r, c, 40);
 	}
 
 	public Board(int r, int c, int numMines) {
 		_tiles = new Tile[r][c];
+		_clicked = new Boolean[r][c];
+		_flag = new Boolean[r][c];
+
 		_r = r;
 		_c = c;
 
 		for(int i = 0; i < r; i++) {
 			for(int j = 0; j < c; j++) {
 				_tiles[i][j] = EMPTY;
+				_clicked[i][j] = false;
+				_flag[i][j] = false;
 			}
 		}
 
@@ -34,9 +42,12 @@ public class Board {
 		while(filled < numMines){
 			int temp = rand.nextInt(_r * _c);
 			if(!taken.contains(temp)) {
+				//System.out.println("puttint a mine in at " + (temp / r) + " " + (temp % r));
 				taken.add(temp);
 				filled++;
 				_tiles[temp / r][temp % r] = BOMB;
+			} else {
+				//System.out.println("alread a mine at " + (temp / r) + " " + (temp % r));
 			}
 		}
 
@@ -55,7 +66,7 @@ public class Board {
 
 	private void evaluateHelper(int r, int c) {
 		int count = 0;
-		for(Direction dir = NOWHERE; dir != null; dir = dir.succ()) {
+		for(Direction dir = N; dir != null; dir = dir.succ()) {
 			if(isValid(r + dir.r, c + dir.c)) {
 				if(_tiles[r + dir.r][c + dir.c] == BOMB) {
 					count++;
@@ -63,6 +74,48 @@ public class Board {
 			}
 		}
 		_tiles[r][c] = Tile.toTile(count);
+	}
+
+	public Boolean isBomb(int r, int c) {
+		return _tiles[r][c] == BOMB;
+	}
+
+	public void click(int r, int c) {
+		_clicked[r][c] = true;
+		if(_tiles[r][c] == EMPTY) {
+			for(Direction dir = N; dir != null; dir = dir.succ()) {
+				int r1 = r + dir.r;
+				int c1 = c + dir.c;
+				System.out.println("Checkout out " + r1 + " " + c1);
+				if(isValid(r1, c1) && !_clicked[r1][c1] && _tiles[r1][c1] != BOMB) {
+					click(r1, c1);
+				}
+			}
+		}
+	}
+
+	public Boolean isClicked(int r, int c) {
+		return _clicked[r][c];
+	}
+
+	public void setFlag(int r, int c) {
+		_flag[r][c] = !_flag[r][c];
+	}
+
+	public Boolean isFlag(int r, int c) {
+		return _flag[r][c];
+	}
+
+	public Tile getTile(int r, int c) {
+		return _tiles[r][c];
+	}
+
+	public int getRows() {
+		return _r;
+	}
+
+	public int getCols() {
+		return _c;
 	}
 
 	private Boolean isValid(int r, int c) {
