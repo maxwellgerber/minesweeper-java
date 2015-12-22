@@ -20,7 +20,7 @@ class mineGUI extends TopLevel{
         _disp = new Display(b);
         _randomSource = new Random();
 
-        // addMenuButton("Game->New Game", "newGame");
+        addMenuButton("Game->New Game", "newGame");
         // addMenuButton("Game->Undo", "undo");
         addMenuButton("Game->Quit", "quit");
 
@@ -38,12 +38,12 @@ class mineGUI extends TopLevel{
         }
     }
 
-    // /** Respond to "New Game" button. */
-    // public void newGame(String dummy) {
-    //     _b.clear();
-    //     _disp.repaint();
-    //     _playable = true;
-    // }
+    /** Respond to "New Game" button. */
+    public void newGame(String dummy) {
+        _b = _b.newGame();
+        _disp.newGame(_b);
+        _disp.repaint();
+    }
 
     // /** Respond to "Undo"" button. */
     // public void undo(String dummy) {
@@ -54,9 +54,32 @@ class mineGUI extends TopLevel{
     /** Responds to MouseEvent EVENT by alterint underlying board. */
     public void mouseClicked(MouseEvent event) {
         int x = event.getX() / (16), y = event.getY() / (16);
-        System.out.println("X: " + x + " Y: " + y);
-        _b.click(x, y);
+        if(event.getButton() == 1) {
+            if(_b.isBomb(x, y)) {
+                gameOver("YOU LOSE");
+            } else {
+                _b.click(x, y);
+                if(_b.isWon()) {
+                    gameOver("YOU WIN!");
+                }   
+            }
+        } else {
+            _b.setFlag(x, y);
+        }
+        // System.out.println("X: " + x + " Y: " + y);
+        // System.out.println(event.getButton());
         _disp.repaint();
+    }
+
+    public void gameOver(String s) {
+            _b.endGame();
+            _disp.repaint();
+        if (showOptions(s, "", "question",
+            "New Game", "New Game", "Quit") == 1) {
+            System.exit(1);
+        } else {
+            newGame("dummy");
+        }
     }
 
     /** The board widget. */

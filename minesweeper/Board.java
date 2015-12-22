@@ -10,7 +10,7 @@ public class Board {
 	Boolean[][] _clicked;
 	Boolean[][] _flag;
 
-	int _r, _c;
+	int _r, _c, _numMines, _numCleared;
 	
 	public Board() {
 		this(16,16);
@@ -27,6 +27,8 @@ public class Board {
 
 		_r = r;
 		_c = c;
+		_numMines = numMines;
+		_numCleared = 0;
 
 		for(int i = 0; i < r; i++) {
 			for(int j = 0; j < c; j++) {
@@ -54,6 +56,10 @@ public class Board {
 		evaluate();
 	}
 
+	public Board newGame() {
+		return new Board(_r, _c, _numMines);
+	}
+
 	private void evaluate() {
 		for(int i = 0; i < _r; i++) {
 			for(int j = 0; j < _c; j++) {
@@ -76,19 +82,36 @@ public class Board {
 		_tiles[r][c] = Tile.toTile(count);
 	}
 
+	public Boolean isWon() {
+		return _numCleared == _r * _c - _numMines;
+	}
+
 	public Boolean isBomb(int r, int c) {
 		return _tiles[r][c] == BOMB;
 	}
 
+	public void endGame() {
+		for(int i = 0; i < _r; i++) {
+			for(int j = 0; j < _c; j++) {
+				if(!_clicked[i][j]) {
+					click(i, j);
+				}
+			}
+		}
+	}
+
 	public void click(int r, int c) {
-		_clicked[r][c] = true;
-		if(_tiles[r][c] == EMPTY) {
-			for(Direction dir = N; dir != null; dir = dir.succ()) {
-				int r1 = r + dir.r;
-				int c1 = c + dir.c;
-				System.out.println("Checkout out " + r1 + " " + c1);
-				if(isValid(r1, c1) && !_clicked[r1][c1] && _tiles[r1][c1] != BOMB) {
-					click(r1, c1);
+		if(!_clicked[r][c]) {
+			_numCleared++;
+			_clicked[r][c] = true;
+			if(_tiles[r][c] == EMPTY) {
+				for(Direction dir = N; dir != null; dir = dir.succ()) {
+					int r1 = r + dir.r;
+					int c1 = c + dir.c;
+					// System.out.println("Checkout out " + r1 + " " + c1);
+					if(isValid(r1, c1) && !_clicked[r1][c1] && _tiles[r1][c1] != BOMB) {
+						click(r1, c1);
+					}
 				}
 			}
 		}

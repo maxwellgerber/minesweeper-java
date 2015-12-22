@@ -115,6 +115,10 @@ class Display extends Pad {
         paintTiles(g);
     }
 
+    public void newGame(Board b) {
+        _b = b;
+    }
+
     /** Game I am displaying. */
     private Board _b;
 
