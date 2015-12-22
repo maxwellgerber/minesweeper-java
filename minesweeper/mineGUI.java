@@ -37,19 +37,13 @@ class mineGUI extends TopLevel{
             System.exit(0);
         }
     }
-
+    
     /** Respond to "New Game" button. */
     public void newGame(String dummy) {
         _b = _b.newGame();
         _disp.newGame(_b);
         _disp.repaint();
     }
-
-    // /** Respond to "Undo"" button. */
-    // public void undo(String dummy) {
-    //     _b.retract();
-    //     _disp.repaint();
-    // }
 
     /** Responds to MouseEvent EVENT by alterint underlying board. */
     public void mouseClicked(MouseEvent event) {

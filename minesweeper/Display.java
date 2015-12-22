@@ -105,7 +105,6 @@ class Display extends Pad {
         }
     }
 
-
     /** Prints the background, all static objects, and calls drag function. */
     @Override
     public synchronized void paintComponent(Graphics2D g) {

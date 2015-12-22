@@ -16,20 +16,26 @@ public class Board {
 		this(16,16);
 	}
 
+	public Board(String r, String c) {
+		this(Integer.parseInt(r), Integer.parseInt(c));
+	}
+
 	public Board(int r, int c) {
-		this(r, c, 40);
+		this(r, c, r * c / 9);
+	}
+
+	public Board(String r, String c, String numMines) {
+		this(Integer.parseInt(r), Integer.parseInt(c), Integer.parseInt(numMines));
 	}
 
 	public Board(int r, int c, int numMines) {
 		_tiles = new Tile[r][c];
 		_clicked = new Boolean[r][c];
 		_flag = new Boolean[r][c];
-
 		_r = r;
 		_c = c;
 		_numMines = numMines;
 		_numCleared = 0;
-
 		for(int i = 0; i < r; i++) {
 			for(int j = 0; j < c; j++) {
 				_tiles[i][j] = EMPTY;
@@ -37,7 +43,6 @@ public class Board {
 				_flag[i][j] = false;
 			}
 		}
-
 		Random rand = new Random();
 		ArrayList<Integer> taken = new ArrayList<>();
 		int filled = 0;
@@ -48,11 +53,8 @@ public class Board {
 				taken.add(temp);
 				filled++;
 				_tiles[temp / r][temp % r] = BOMB;
-			} else {
-				//System.out.println("alread a mine at " + (temp / r) + " " + (temp % r));
 			}
 		}
-
 		evaluate();
 	}
 
