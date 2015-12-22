@@ -7,4 +7,5 @@ public enum Tile {
 	static Tile toTile(int i) {
 		return values()[i];
 	}
+
 }

@@ -102,8 +102,10 @@ public class Board {
 		}
 	}
 
-	public void click(int r, int c) {
+	public ArrayList<int[]> click(int r, int c) {
+		ArrayList<int[]> cleared = new ArrayList<>();
 		if(!_clicked[r][c]) {
+			cleared.add(new int[]{r, c});
 			_numCleared++;
 			_clicked[r][c] = true;
 			if(_tiles[r][c] == EMPTY) {
@@ -112,11 +114,16 @@ public class Board {
 					int c1 = c + dir.c;
 					// System.out.println("Checkout out " + r1 + " " + c1);
 					if(isValid(r1, c1) && !_clicked[r1][c1] && _tiles[r1][c1] != BOMB) {
-						click(r1, c1);
+						cleared.addAll(click(r1, c1));
 					}
 				}
 			}
 		}
+		return cleared;
+	}
+
+	public Boolean isClicked(int[] pos) {
+		return isClicked(pos[0], pos[1]);
 	}
 
 	public Boolean isClicked(int r, int c) {
@@ -131,6 +138,10 @@ public class Board {
 		return _flag[r][c];
 	}
 
+	public Tile getTile(int[] pos) {
+		return getTile(pos[0],pos[1]);
+	}
+
 	public Tile getTile(int r, int c) {
 		return _tiles[r][c];
 	}
@@ -143,7 +154,7 @@ public class Board {
 		return _c;
 	}
 
-	private Boolean isValid(int r, int c) {
+	public Boolean isValid(int r, int c) {
 		return (r >= 0 && c >= 0) && (r < _r && c < _c);
 	}
 }

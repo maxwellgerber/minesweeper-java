@@ -24,6 +24,9 @@ class mineGUI extends TopLevel{
         // addMenuButton("Game->Undo", "undo");
         addMenuButton("Game->Quit", "quit");
 
+        addMenuButton("AI->Make Move", "makeMove");
+        addMenuButton("AI->Autocomplete", "Autocomplete");
+
         _disp = new Display(b);
         add(_disp, new LayoutSpec("y", 2, "width", 2));
         _disp.setMouseHandler("click", this, "mouseClicked");
@@ -37,12 +40,52 @@ class mineGUI extends TopLevel{
             System.exit(0);
         }
     }
-    
+
     /** Respond to "New Game" button. */
     public void newGame(String dummy) {
         _b = _b.newGame();
         _disp.newGame(_b);
         _disp.repaint();
+    }
+
+    public void makeMove(String dummy) {
+        autoplayer AI = new autoplayer(_b);
+        int[] move = AI.nextMove("flag");
+        if(move == null) {
+            move = AI.nextMove("click");
+            if(_b.isBomb(move[0], move[1])) {
+                gameOver("YOU LOSE");
+            } else {
+                _b.click(move[0], move[1]);
+                if(_b.isWon()) {
+                    gameOver("YOU WIN!");
+                }   
+            }
+        }
+        _b.setFlag(move[0], move[1]);
+        _disp.repaint();
+    }
+
+    public void Autocomplete(String dummy) {
+        autoplayer AI = new autoplayer(_b, _disp);
+        while(!_b.isWon()) {
+            int[] move = AI.nextMove("flag");
+            if(move == null) {
+                move = AI.nextMove("click");
+                if(_b.isBomb(move[0], move[1])) {
+                    gameOver("YOU LOSE");
+                    break;
+                } else {
+                    _b.click(move[0], move[1]);
+                    if(_b.isWon()) {
+                        gameOver("YOU WIN!");
+                        break;
+                    }   
+                }
+            }
+            _b.setFlag(move[0], move[1]);
+            _disp.repaint(1);
+        }
     }
 
     /** Responds to MouseEvent EVENT by alterint underlying board. */
