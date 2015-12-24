@@ -44,15 +44,17 @@ public class Board {
 			}
 		}
 		Random rand = new Random();
-		ArrayList<Integer> taken = new ArrayList<>();
+		ArrayList<int[]> taken = new ArrayList<>();
 		int filled = 0;
 		while(filled < numMines){
-			int temp = rand.nextInt(_r * _c);
+			int tempr = rand.nextInt(_r);
+			int tempc = rand.nextInt(_c);
+			int[] temp = new int[]{tempr, tempc};
 			if(!taken.contains(temp)) {
 				//System.out.println("puttint a mine in at " + (temp / r) + " " + (temp % r));
 				taken.add(temp);
 				filled++;
-				_tiles[temp / r][temp % r] = BOMB;
+				_tiles[tempr][tempc] = BOMB;
 			}
 		}
 		evaluate();

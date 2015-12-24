@@ -18,21 +18,22 @@ import java.io.IOException;
 class Display extends Pad {
 
     /** Color of display field. */
-    private static final Color BACKGROUND_COLOR = Color.white;
+    private static final Color BACKGROUND_COLOR = Color.gray;
 
     /* Coordinates and lengths in pixels unless otherwise stated. */
 
     /** Preferred dimensions of the playing surface. */
     private static final int TILE_WIDTH = 16, TILE_HEIGHT = 16;
+    public static final int TOP_MARGIN = 0;
     private static int BOARD_WIDTH, BOARD_HEIGHT;
     private static Image emptyImg, bombImg, blankImg, oneImg, twoImg, threeImg,
     fourImg, fiveImg, sixImg, sevenImg, eightImg, flagImg;
 
-    /** A graphical representation of B. */
+    /** A graphical representation of B. Load images into local memory for speed.*/
     public Display(Board b) {
         _b = b;
         BOARD_WIDTH = TILE_WIDTH * b.getCols();
-        BOARD_HEIGHT = TILE_HEIGHT * b.getRows();
+        BOARD_HEIGHT = TILE_HEIGHT * b.getRows() + TOP_MARGIN;
         setPreferredSize(BOARD_WIDTH, BOARD_HEIGHT);
         emptyImg = getImage("empty");
         bombImg = getImage("bomb");
@@ -47,17 +48,19 @@ class Display extends Pad {
         eightImg = getImage("eight");
     }
 
+    /** Draws all tiles in proper location. */
     public void paintTiles(Graphics2D g) {
         int r = _b.getRows();
         int c = _b.getCols();
         for(int i = 0; i < r; i++) {
             for(int j = 0; j < c; j++) {
-                g.drawImage(getTileImage(i, j), i * TILE_WIDTH, j * TILE_HEIGHT,
+                g.drawImage(getTileImage(i, j), j * TILE_WIDTH, TOP_MARGIN + i * TILE_HEIGHT,
                     TILE_WIDTH, TILE_HEIGHT, null);
             }
         }
     }
 
+    /** returns appropriate tile image based on that tile's state. */
     public Image getTileImage(int r, int c) {
         if(_b.isClicked(r,c)) {
             return getBottomTileImage(r, c);    
@@ -68,6 +71,7 @@ class Display extends Pad {
         }
     }
 
+    /** Switch between coordinates and image. */
     public Image getBottomTileImage(int r, int c) {
         switch(_b.getTile(r,c)) {
         case EMPTY:
@@ -114,6 +118,7 @@ class Display extends Pad {
         paintTiles(g);
     }
 
+    /** Setter method. */
     public void newGame(Board b) {
         _b = b;
     }

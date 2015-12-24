@@ -48,6 +48,8 @@ class mineGUI extends TopLevel{
         _disp.repaint();
     }
 
+    /** Creates an AI instance and gets a move from it. 
+     *  Executes the move. */
     public void makeMove(String dummy) {
         autoplayer AI = new autoplayer(_b);
         int[] move = AI.nextMove("flag");
@@ -66,6 +68,8 @@ class mineGUI extends TopLevel{
         _disp.repaint();
     }
 
+    /** calls the AI to make moves until the game is won or lost. 
+     *  Can't figure out how to make display repaint though. */
     public void Autocomplete(String dummy) {
         autoplayer AI = new autoplayer(_b, _disp);
         while(!_b.isWon()) {
@@ -82,32 +86,36 @@ class mineGUI extends TopLevel{
                         break;
                     }   
                 }
+            } else {
+                _b.setFlag(move[0], move[1]);
+                _disp.repaint(1);
             }
-            _b.setFlag(move[0], move[1]);
-            _disp.repaint(1);
         }
     }
 
-    /** Responds to MouseEvent EVENT by alterint underlying board. */
+    /** Responds to MouseEvent EVENT by altering underlying board. */
     public void mouseClicked(MouseEvent event) {
-        int x = event.getX() / (16), y = event.getY() / (16);
-        if(event.getButton() == 1) {
-            if(_b.isBomb(x, y)) {
-                gameOver("YOU LOSE");
+        int y = event.getX() / 16, x = (event.getY() - Display.TOP_MARGIN) / 16 ;
+        if(x >= 0) {
+            if(event.getButton() == 1) {
+                if(_b.isBomb(x, y)) {
+                    gameOver("YOU LOSE");
+                } else {
+                    _b.click(x, y);
+                    if(_b.isWon()) {
+                        gameOver("YOU WIN!");
+                    }   
+                }
             } else {
-                _b.click(x, y);
-                if(_b.isWon()) {
-                    gameOver("YOU WIN!");
-                }   
+                _b.setFlag(x, y);
             }
-        } else {
-            _b.setFlag(x, y);
+            // System.out.println("X: " + x + " Y: " + y);
+            // System.out.println(event.getButton());
         }
-        // System.out.println("X: " + x + " Y: " + y);
-        // System.out.println(event.getButton());
         _disp.repaint();
     }
 
+    /** Ends the game and prompts the user using S. */
     public void gameOver(String s) {
             _b.endGame();
             _disp.repaint();
@@ -125,5 +133,6 @@ class mineGUI extends TopLevel{
     /** The game I am consulting. */
     private Board _b;
 
+    /** Might use this later. */
     private Random _randomSource;
 }

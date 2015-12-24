@@ -21,11 +21,10 @@ class autoplayer{
     }
 
     public int[] nextMove(String behavior){
-        // while(findBomb()){
-        // }
 
         Set<int[]> fringe = new HashSet<>();
         Set<int[]> clicked = new HashSet<>();
+        Set<double[]> guess = new HashSet<>();
 
         for(int i = 0; i < _b._r; i++) {
             for(int j = 0; j < _b._c; j++) {
@@ -34,17 +33,18 @@ class autoplayer{
                 }
             }
         }
+        
         for(int[] pos: clicked) {
             if(_b.getTile(pos) != EMPTY && notCleared(pos)) {
                 fringe.add(pos);
             }
         }
 
-        if(fringe.size() == 0 && behavior.equals("click")) {
-            Random r = new Random();
-            System.out.printf("No tiles in fringe. Making a random guess.");
-            return new int[] {r.nextInt(_b._r), r.nextInt(_b._c)};
-        }
+        // if(fringe.size() == 0 && behavior.equals("click")) {
+        //     Random r = new Random();
+        //     System.out.printf("No tiles in fringe. Making a random guess.%n");
+        //     return new int[] {r.nextInt(_b._r), r.nextInt(_b._c)};
+        // }
 
         for(int[] pos: fringe) {
             System.out.println("Checking out: " + pos[0] + " " + pos[1]);
@@ -68,7 +68,7 @@ class autoplayer{
                         return new int[]{r,c};
                     }
                 }
-            } else if (behavior.equals("flag")){
+            } else {
                 System.out.printf("Some bombs still unmarked. Seeing if we can mark them.%n");
                 int unclicked = 0;
                 for(Direction dir = N; dir != null; dir = dir.succ()) {
@@ -79,7 +79,7 @@ class autoplayer{
                     }
                 }
                 System.out.printf("We have %s unclicked neighbors and %s unfound bombs.%n", unclicked, neighbors);
-                if(unclicked == neighbors) {
+                if(unclicked == neighbors && behavior.equals("flag")) {
                     for(Direction dir = N; dir != null; dir = dir.succ()) {
                         int r = pos[0] + dir.r;
                         int c = pos[1] + dir.c;
@@ -87,14 +87,34 @@ class autoplayer{
                             return new int[]{r,c};
                         }
                     }
+                }  else {                    
+                    for(Direction dir = N; dir != null; dir = dir.succ()) {
+                        int r = pos[0] + dir.r;
+                        int c = pos[1] + dir.c;
+                        if(_b.isValid(r, c) && !_b.isFlag(r,c) && !_b.isClicked(r,c)) {
+                            guess.add(new double[]{neighbors/ (double) unclicked, r, c});
+                        }
+                    }
                 }
             }
         }
 
         if(behavior.equals("click")) {
-            Random r = new Random();
-            System.out.printf("No suitable tile found. Making a random guess.%n");
-            return new int[] {r.nextInt(_b._r), r.nextInt(_b._c)};
+            System.out.printf("No suitable tile found. Making an educated guess.%n");
+            double score = 1;
+            Random rand = new Random();
+            int r = rand.nextInt(_b._r);
+            int c = rand.nextInt(_b._c);
+            for(double[] g: guess) {
+                System.out.printf("Probability of a bomb is %s at %s, %s %n", g[0], g[1], g[2]);
+                if(g[0] < score) {
+                    r = (int) g[1];
+                    c = (int) g[2];
+                    score = g[0];
+                }
+            }
+            System.out.printf("Guessing %s,%s%n", r, c);
+            return new int[]{r,c};
         }
         return null;
     }
