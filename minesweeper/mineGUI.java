@@ -33,6 +33,13 @@ class mineGUI extends JPanel{
             }
         });
 
+        repainter = new Timer(300, new ActionListener(){
+            @Override
+            public void actionPerformed(ActionEvent evt) {
+                makeMove();
+            }
+        });
+
         addMouseListener(new MouseAdapter() {
             @Override
             public void mouseClicked(MouseEvent e) {
@@ -57,7 +64,7 @@ class mineGUI extends JPanel{
     }
 
     public JMenuBar createMenuBar() {
-        JMenuBar menuBar;
+        final JMenuBar menuBar;
         JMenu menu, submenu;
         JMenuItem menuItem;
         JRadioButtonMenuItem rbMenuItem;
@@ -72,22 +79,43 @@ class mineGUI extends JPanel{
  
         menu.addSeparator();
         ButtonGroup group = new ButtonGroup();
-        rbMenuItem = new JRadioButtonMenuItem("Beginner: 9 x 9 : 10 mines");
-        rbMenuItem.setSelected(true);
+        rbMenuItem = new JRadioButtonMenuItem("Beginner");
+        rbMenuItem.addActionListener(new ActionListener(){
+            public void actionPerformed(ActionEvent e) {
+              _b = new Board(9,9,10);
+              _disp.newGame(_b);
+              repaint();
+              menuBar.getParent().getParent().getParent().setSize(145,193);
+            }
+        });
         group.add(rbMenuItem);
         menu.add(rbMenuItem);
         rbMenuItem = new JRadioButtonMenuItem("Intermediate");
         rbMenuItem.setSelected(true);
+        rbMenuItem.addActionListener(new ActionListener(){
+            public void actionPerformed(ActionEvent e) {
+              _b = new Board(16,16,40);
+              _disp.newGame(_b);
+              repaint();
+              menuBar.getParent().getParent().getParent().setSize(258,304);
+            }
+        });
         group.add(rbMenuItem);
         menu.add(rbMenuItem);
         rbMenuItem = new JRadioButtonMenuItem("Expert");
-        rbMenuItem.setSelected(true);
+        rbMenuItem.addActionListener(new ActionListener(){
+            public void actionPerformed(ActionEvent e) {
+              _b = new Board(16,30,99);
+              _disp.newGame(_b);
+              repaint();
+              menuBar.getParent().getParent().getParent().setSize(481,304);
+            }
+        });
         group.add(rbMenuItem);
         menu.add(rbMenuItem);
-        rbMenuItem = new JRadioButtonMenuItem("Custom");
-        rbMenuItem.setSelected(true);
-        group.add(rbMenuItem);
-        menu.add(rbMenuItem);
+        // rbMenuItem = new JRadioButtonMenuItem("Custom");
+        // group.add(rbMenuItem);
+        // menu.add(rbMenuItem);
         menu.addSeparator();
         menuItem = new JMenuItem("New Game");
         menuItem.addActionListener(new ActionListener() {
@@ -106,6 +134,26 @@ class mineGUI extends JPanel{
             }
         });
         menu.add(menuItem);
+
+        menu = new JMenu("AI");
+        menuBar.add(menu);
+        menuItem = new JMenuItem("Make Move");
+        menuItem.addActionListener(new ActionListener() {
+            @Override
+            public void actionPerformed(ActionEvent arg0) {
+                makeMove();
+            }
+        });
+        menu.add(menuItem);
+        menuItem = new JMenuItem("Autocomplete");
+        menuItem.addActionListener(new ActionListener() {
+            @Override
+            public void actionPerformed(ActionEvent arg0) {
+                Autocomplete();
+            }
+        });
+        menu.add(menuItem);
+
         return menuBar;
     }
  
@@ -124,7 +172,7 @@ class mineGUI extends JPanel{
 
     /** Creates an AI instance and gets a move from it. 
      *  Executes the move. */
-    public void makeMove(String dummy) {
+    public void makeMove() {
         autoplayer AI = new autoplayer(_b);
         int[] move = AI.nextMove("flag");
         if(move == null) {
@@ -137,34 +185,16 @@ class mineGUI extends JPanel{
                     gameOver("YOU WIN!");
                 }   
             }
+        } else {
+            _b.setFlag(move[0], move[1]);
         }
-        _b.setFlag(move[0], move[1]);
         repaint();
     }
 
     /** calls the AI to make moves until the game is won or lost. 
      *  Can't figure out how to make display repaint though. */
-    public void Autocomplete(String dummy) {
-        autoplayer AI = new autoplayer(_b, _disp);
-        while(!_b.isWon()) {
-            int[] move = AI.nextMove("flag");
-            if(move == null) {
-                move = AI.nextMove("click");
-                if(_b.isBomb(move[0], move[1])) {
-                    gameOver("YOU LOSE");
-                    break;
-                } else {
-                    _b.click(move[0], move[1]);
-                    if(_b.isWon()) {
-                        gameOver("YOU WIN!");
-                        break;
-                    }   
-                }
-            } else {
-                _b.setFlag(move[0], move[1]);
-                repaint();
-            }
-        }
+    public void Autocomplete() {
+        repainter.start();
     }
 
     /** Responds to MouseEvent EVENT by altering underlying board. */
@@ -189,6 +219,7 @@ class mineGUI extends JPanel{
 
     /** Ends the game and prompts the user using S. */
     public void gameOver(String s) {
+        repainter.stop();
         _b.endGame();
         repaint();
         int response = JOptionPane.showConfirmDialog( null,
@@ -211,4 +242,5 @@ class mineGUI extends JPanel{
     private Random _randomSource;
 
     Timer hover;
+    Timer repainter;
 }

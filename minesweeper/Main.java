@@ -21,19 +21,19 @@ public class Main {
     /** The main function for Minesweeper. 
      */
     public static void main(String... args) {
-        System.out.printf("Minesweeper. Version %s%nType ? for help.%n",
+        System.out.printf("Minesweeper. Version %s%n",
                           VERSION);
-        Board b = null;
-        if(args.length == 0) {
-            b = new Board();
-        } else if(args.length == 2) {
-            b = new Board(args[0], args[1]);
-        } else if (args.length == 3) {
-            b = new Board(args[0], args[1], args[2]);
-        } else {
-            System.out.printf("Usage: java minesweeper.Main [#rows][#cols][#mines]%n%n");
-            System.exit(0);
-        }
+        Board b = new Board();
+        // if(args.length == 0) {
+        //     b = new Board();
+        // } else if(args.length == 2) {
+        //     b = new Board(args[0], args[1]);
+        // } else if (args.length == 3) {
+        //     b = new Board(args[0], args[1], args[2]);
+        // } else {
+        //     System.out.printf("Usage: java minesweeper.Main [#rows][#cols][#mines]%n%n");
+        //     System.exit(0);
+        // }
 
         JFrame frame = new JFrame();
         frame.setTitle("Minesweeper-java");

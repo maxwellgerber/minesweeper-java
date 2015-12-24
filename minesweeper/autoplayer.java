@@ -1,8 +1,7 @@
 package minesweeper;
 
-import java.util.Set;
-import java.util.HashSet;
-import java.util.Random;
+import java.util.*;
+import java.awt.Point;
 import static minesweeper.Direction.*;
 import static minesweeper.Tile.*;
 
@@ -24,7 +23,7 @@ class autoplayer{
 
         Set<int[]> fringe = new HashSet<>();
         Set<int[]> clicked = new HashSet<>();
-        Set<double[]> guess = new HashSet<>();
+        Map<Point, Double> guess = new HashMap<>();
 
         for(int i = 0; i < _b._r; i++) {
             for(int j = 0; j < _b._c; j++) {
@@ -92,7 +91,11 @@ class autoplayer{
                         int r = pos[0] + dir.r;
                         int c = pos[1] + dir.c;
                         if(_b.isValid(r, c) && !_b.isFlag(r,c) && !_b.isClicked(r,c)) {
-                            guess.add(new double[]{neighbors/ (double) unclicked, r, c});
+                            double prop = neighbors/ (double) unclicked;
+                            Point p = new Point(r, c);
+                            if(guess.get(p) == null || guess.get(p) < prop) {
+                                guess.put(p, prop);
+                            }
                         }
                     }
                 }
@@ -101,16 +104,18 @@ class autoplayer{
 
         if(behavior.equals("click")) {
             System.out.printf("No suitable tile found. Making an educated guess.%n");
-            double score = 1;
+            double score = 1.0;
             Random rand = new Random();
             int r = rand.nextInt(_b._r);
             int c = rand.nextInt(_b._c);
-            for(double[] g: guess) {
-                System.out.printf("Probability of a bomb is %s at %s, %s %n", g[0], g[1], g[2]);
-                if(g[0] < score) {
-                    r = (int) g[1];
-                    c = (int) g[2];
-                    score = g[0];
+            for(Point p: guess.keySet()) {
+                System.out.println("k");
+                double s = guess.get(p);
+                if(s < score) {
+                    r = (int) p.getX();
+                    c = (int) p.getY();
+                    score = s;
+                    System.out.printf("Probability of a bomb is %s at %s, %s %n", s, r, c);
                 }
             }
             System.out.printf("Guessing %s,%s%n", r, c);
