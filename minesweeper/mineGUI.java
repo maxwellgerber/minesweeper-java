@@ -1,9 +1,9 @@
 package minesweeper;
 
-import ucb.gui.TopLevel;
-import ucb.gui.LayoutSpec;
-
-import java.awt.event.MouseEvent;
+import java.awt.*;
+import java.awt.event.*;
+import java.util.Arrays;
+import javax.swing.*;
 
 import java.util.Random;
 
@@ -11,41 +11,115 @@ import java.util.Random;
  *  @author Maxwell Gerber
  */
 
-class mineGUI extends TopLevel{
+class mineGUI extends JPanel{
 
     /** A new window with given TITLE and displaying B. */
-    mineGUI(String title, Board b) {
-        super(title, true);
+    mineGUI(Board b) {
+        super();
         _b = b;
         _disp = new Display(b);
         _randomSource = new Random();
 
-        addMenuButton("Game->New Game", "newGame");
-        // addMenuButton("Game->Undo", "undo");
-        addMenuButton("Game->Quit", "quit");
+        _disp = new Display(b);        
 
-        addMenuButton("AI->Make Move", "makeMove");
-        addMenuButton("AI->Autocomplete", "Autocomplete");
+        hover = new Timer(40, new ActionListener(){
+            @Override
+            public void actionPerformed(ActionEvent evt) {
+                Point now = getMousePosition(false);
+                if(now != null){
+                    _disp.hoverEffect(now.getX(), now.getY());
+                    repaint();
+                }
+            }
+        });
 
-        _disp = new Display(b);
-        add(_disp, new LayoutSpec("y", 2, "width", 2));
-        _disp.setMouseHandler("click", this, "mouseClicked");
-        display(true);
+        addMouseListener(new MouseAdapter() {
+            @Override
+            public void mouseClicked(MouseEvent e) {
+                mouseClickedResponse(e);
+            }
+
+            @Override
+            public void mouseEntered(MouseEvent e) {
+                hover.start();
+            }
+            @Override
+            public void mouseExited(MouseEvent e) {
+                hover.stop();
+                _disp.hoverEffect(-16, -16);
+                repaint();
+            }
+        });
     }
 
+    public void paintComponent(Graphics g) {
+        _disp.paintComponent((Graphics2D) g);
+    }
+
+    public JMenuBar createMenuBar() {
+        JMenuBar menuBar;
+        JMenu menu, submenu;
+        JMenuItem menuItem;
+        JRadioButtonMenuItem rbMenuItem;
+        JCheckBoxMenuItem cbMenuItem;
+ 
+        //Create the menu bar.
+        menuBar = new JMenuBar();
+ 
+        //Build the first menu.
+        menu = new JMenu("Game");
+        menuBar.add(menu);
+ 
+        menu.addSeparator();
+        ButtonGroup group = new ButtonGroup();
+        rbMenuItem = new JRadioButtonMenuItem("Beginner: 9 x 9 : 10 mines");
+        rbMenuItem.setSelected(true);
+        group.add(rbMenuItem);
+        menu.add(rbMenuItem);
+        rbMenuItem = new JRadioButtonMenuItem("Intermediate");
+        rbMenuItem.setSelected(true);
+        group.add(rbMenuItem);
+        menu.add(rbMenuItem);
+        rbMenuItem = new JRadioButtonMenuItem("Expert");
+        rbMenuItem.setSelected(true);
+        group.add(rbMenuItem);
+        menu.add(rbMenuItem);
+        rbMenuItem = new JRadioButtonMenuItem("Custom");
+        rbMenuItem.setSelected(true);
+        group.add(rbMenuItem);
+        menu.add(rbMenuItem);
+        menu.addSeparator();
+        menuItem = new JMenuItem("New Game");
+        menuItem.addActionListener(new ActionListener() {
+            @Override
+            public void actionPerformed(ActionEvent arg0) {
+                newGame();
+            }
+        });
+        menu.add(menuItem);
+        menu.addSeparator();
+        menuItem = new JMenuItem("Quit");
+        menuItem.addActionListener(new ActionListener() {
+            @Override
+            public void actionPerformed(ActionEvent arg0) {
+                quit();
+            }
+        });
+        menu.add(menuItem);
+        return menuBar;
+    }
+ 
+
     /** Respond to "Quit" button. */
-    public void quit(String dummy) {
-        if (showOptions("Really quit?", "Quit?", "question",
-                "Yes", "Yes", "No") == 0) {
-            System.exit(0);
-        }
+    public void quit() {
+        System.exit(0);
     }
 
     /** Respond to "New Game" button. */
-    public void newGame(String dummy) {
+    public void newGame() {
         _b = _b.newGame();
         _disp.newGame(_b);
-        _disp.repaint();
+        repaint();
     }
 
     /** Creates an AI instance and gets a move from it. 
@@ -65,7 +139,7 @@ class mineGUI extends TopLevel{
             }
         }
         _b.setFlag(move[0], move[1]);
-        _disp.repaint();
+        repaint();
     }
 
     /** calls the AI to make moves until the game is won or lost. 
@@ -88,13 +162,13 @@ class mineGUI extends TopLevel{
                 }
             } else {
                 _b.setFlag(move[0], move[1]);
-                _disp.repaint(1);
+                repaint();
             }
         }
     }
 
     /** Responds to MouseEvent EVENT by altering underlying board. */
-    public void mouseClicked(MouseEvent event) {
+    public void mouseClickedResponse(MouseEvent event) {
         int y = event.getX() / 16, x = (event.getY() - Display.TOP_MARGIN) / 16 ;
         if(x >= 0) {
             if(event.getButton() == 1) {
@@ -109,21 +183,21 @@ class mineGUI extends TopLevel{
             } else {
                 _b.setFlag(x, y);
             }
-            // System.out.println("X: " + x + " Y: " + y);
-            // System.out.println(event.getButton());
         }
-        _disp.repaint();
+        repaint();
     }
 
     /** Ends the game and prompts the user using S. */
     public void gameOver(String s) {
-            _b.endGame();
-            _disp.repaint();
-        if (showOptions(s, "", "question",
-            "New Game", "New Game", "Quit") == 1) {
-            System.exit(1);
+        _b.endGame();
+        repaint();
+        int response = JOptionPane.showConfirmDialog( null,
+        "Would you like to play another game?", s,
+        JOptionPane.YES_NO_OPTION);
+        if (response == 1) {
+            quit();
         } else {
-            newGame("dummy");
+            newGame();
         }
     }
 
@@ -135,4 +209,6 @@ class mineGUI extends TopLevel{
 
     /** Might use this later. */
     private Random _randomSource;
+
+    Timer hover;
 }

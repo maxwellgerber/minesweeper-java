@@ -5,7 +5,10 @@ import java.io.InputStream;
 import java.io.InputStreamReader;
 import java.io.IOException;
 
-import ucb.util.CommandArgs;
+import java.awt.*;
+import java.awt.event.*;
+import java.util.Arrays;
+import javax.swing.*;
 
 /** Main class of the Minesweeper program.
  * @author Maxwell Gerber
@@ -13,7 +16,7 @@ import ucb.util.CommandArgs;
 public class Main {
 
     /** Version designator. */
-    public static final String VERSION = ".5";
+    public static final String VERSION = ".75";
 
     /** The main function for Minesweeper. 
      */
@@ -31,6 +34,20 @@ public class Main {
             System.out.printf("Usage: java minesweeper.Main [#rows][#cols][#mines]%n%n");
             System.exit(0);
         }
-        mineGUI gui = new mineGUI("Minesweeper-java", b);
+
+        JFrame frame = new JFrame();
+        frame.setTitle("Minesweeper-java");
+        int BOARD_WIDTH = 16 * b.getCols();
+        int BOARD_HEIGHT = 16 * b.getRows();
+        frame.setSize(BOARD_WIDTH + 1, BOARD_HEIGHT + 49);
+        frame.addWindowListener(new WindowAdapter() {
+            public void windowClosing(WindowEvent e) {
+                System.exit(0);
+                }
+        });
+        mineGUI board = new mineGUI(b);
+        frame.add(board);
+        frame.setJMenuBar(board.createMenuBar());
+        frame.setVisible(true);
     }
 }
